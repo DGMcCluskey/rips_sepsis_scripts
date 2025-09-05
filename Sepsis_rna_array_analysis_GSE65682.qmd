@@ -3,6 +3,11 @@ title: "Sepsis RNA array analysis"
 format: html
 ---
 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
 #RNA array profiles of over 800 sepsis patients with varying survivor status Data from GSE65682 and https://www.sciencedirect.com/science/article/pii/S2213260017302941#cesec20
 
 ```{r}
@@ -15,6 +20,18 @@ library(limma)
 setwd("C:/Users/dan94/rips_project/")
 ```
 
+
+#load in the expression matrix
+##getGEO pulls directly from the GEO website
+##take the first slot of the data containing the correct platform
+
 ```{r}
-geo_data <- getGEO(filename = "GSE65682_series_matrix.txt/GSE65682_series_matrix.txt")
+geo_data <- getGEO("GSE65682", GSEMatrix = T)
+geo_data <- geo_data[[1]]
+```
+
+#extract the expression data and accompanying metadata
+```{r}
+exprs_df <- exprs(geo_data)
+sample_data <- pData(geo_data)
 ```
