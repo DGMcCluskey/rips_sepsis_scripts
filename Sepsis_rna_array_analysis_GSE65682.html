@@ -98,72 +98,78 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>RNA array profiles of over 800 sepsis patients with varying survivor status Data from GSE65682 and https://www.sciencedirect.com/science/article/pii/S2213260017302941#cesec20</p>
+<section id="rna-array-profiles-of-over-800-sepsis-patients-with-varying-survivor-status-data-from-gse65682-and-httpswww.sciencedirect.comsciencearticlepiis2213260017302941cesec20" class="level1">
+<h1>RNA array profiles of over 800 sepsis patients with varying survivor status Data from GSE65682 and https://www.sciencedirect.com/science/article/pii/S2213260017302941#cesec20</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GEOquery)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: Biobase</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GEOquery)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biomaRt)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(limma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: BiocGenerics</code></pre>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"C:/Users/dan94/rips_project/"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: generics</code></pre>
+<section id="loading-in-data" class="level2">
+<h2 class="anchored" data-anchor-id="loading-in-data">LOADING IN DATA</h2>
+<section id="load-in-the-expression-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="load-in-the-expression-matrix">load in the expression matrix</h3>
+</section>
+<section id="getgeo-pulls-directly-from-the-geo-website" class="level3">
+<h3 class="anchored" data-anchor-id="getgeo-pulls-directly-from-the-geo-website">getGEO pulls directly from the GEO website</h3>
+</section>
+<section id="take-the-first-slot-of-the-data-containing-the-correct-platform" class="level3">
+<h3 class="anchored" data-anchor-id="take-the-first-slot-of-the-data-containing-the-correct-platform">take the first slot of the data containing the correct platform</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>geo_data <span class="ot">&lt;-</span> <span class="fu">getGEO</span>(<span class="st">"GSE65682"</span>, <span class="at">GSEMatrix =</span> T)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>geo_data <span class="ot">&lt;-</span> geo_data[[<span class="dv">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'generics'</code></pre>
+</section>
+<section id="extract-the-expression-data-and-accompanying-metadata" class="level3">
+<h3 class="anchored" data-anchor-id="extract-the-expression-data-and-accompanying-metadata">extract the expression data and accompanying metadata</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">exprs</span>(geo_data)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_data <span class="ot">&lt;-</span> <span class="fu">pData</span>(geo_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,
-    setequal, union</code></pre>
+</section>
+</section>
+<section id="setting-up-data" class="level2">
+<h2 class="anchored" data-anchor-id="setting-up-data">SETTING UP DATA</h2>
+<section id="transpose-the-expression-df-to-have-samples-as-a-row" class="level3">
+<h3 class="anchored" data-anchor-id="transpose-the-expression-df-to-have-samples-as-a-row">transpose the expression df to have samples as a row</h3>
+</section>
+<section id="this-can-then-be-mergeed-with-the-metadata" class="level3">
+<h3 class="anchored" data-anchor-id="this-can-then-be-mergeed-with-the-metadata">this can then be mergeed with the metadata</h3>
+</section>
+<section id="this-results-in-a-single-df-with-each-patient-in-a-row-with-their-expression-data-and" class="level3">
+<h3 class="anchored" data-anchor-id="this-results-in-a-single-df-with-each-patient-in-a-row-with-their-expression-data-and">this results in a single df with each patient in a row, with their expression data and</h3>
+</section>
+<section id="clinical-info-in-the-columns" class="level3">
+<h3 class="anchored" data-anchor-id="clinical-info-in-the-columns">clinical info in the columns</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">t</span>(exprs_df)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(exprs_df)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>exprs_df<span class="sc">$</span>sample_id <span class="ot">&lt;-</span> <span class="fu">rownames</span>(exprs_df)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>sample_data<span class="sc">$</span>sample_id <span class="ot">&lt;-</span> <span class="fu">rownames</span>(sample_data)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">merge</span>(exprs_df, sample_data, <span class="at">by =</span> <span class="st">"sample_id"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'BiocGenerics'</code></pre>
+</section>
+</section>
+<section id="getting-gene-names-for-probes" class="level2">
+<h2 class="anchored" data-anchor-id="getting-gene-names-for-probes">GETTING GENE NAMES FOR PROBES</h2>
+<section id="we-need-to-get-the-ensembl-gene-names-and-then-map-these-to-the-porbes-used-in-the-experiment" class="level3">
+<h3 class="anchored" data-anchor-id="we-need-to-get-the-ensembl-gene-names-and-then-map-these-to-the-porbes-used-in-the-experiment">we need to get the ensembl gene names and then map these to the porbes used in the experiment</h3>
+</section>
+<section id="we-also-pull-out-the-probe-names" class="level3">
+<h3 class="anchored" data-anchor-id="we-also-pull-out-the-probe-names">we also pull out the probe names</h3>
+</section>
+<section id="according-to-geo-this-group-used-hg-u219-affymetrix-human-genome-u219-array" class="level3">
+<h3 class="anchored" data-anchor-id="according-to-geo-this-group-used-hg-u219-affymetrix-human-genome-u219-array">according to geo this group used “[HG-U219] Affymetrix Human Genome U219 Array”</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ensembl <span class="ot">&lt;-</span> <span class="fu">useMart</span>(<span class="st">"ensembl"</span>, <span class="at">dataset =</span> <span class="st">"hsapiens_gene_ensembl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    IQR, mad, sd, var, xtabs</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
-    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
-    get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,
-    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
-    rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,
-    unsplit, which.max, which.min</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Welcome to Bioconductor
-
-    Vignettes contain introductory material; view with
-    'browseVignettes()'. To cite Bioconductor, see
-    'citation("Biobase")', and for packages 'citation("pkgname")'.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Setting options('download.file.method.GEOquery'='auto')</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Setting options('GEOquery.inmemory.gpl'=FALSE)</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biomaRt)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(limma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'limma'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from 'package:BiocGenerics':
-
-    plotMA</code></pre>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 </main>
 <!-- /main column -->

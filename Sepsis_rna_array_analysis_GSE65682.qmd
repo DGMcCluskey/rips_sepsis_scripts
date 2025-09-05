@@ -8,7 +8,7 @@ format: html
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 ```
 
-#RNA array profiles of over 800 sepsis patients with varying survivor status Data from GSE65682 and https://www.sciencedirect.com/science/article/pii/S2213260017302941#cesec20
+# RNA array profiles of over 800 sepsis patients with varying survivor status Data from GSE65682 and https://www.sciencedirect.com/science/article/pii/S2213260017302941#cesec20
 
 ```{r}
 library(GEOquery)
@@ -20,18 +20,53 @@ library(limma)
 setwd("C:/Users/dan94/rips_project/")
 ```
 
-
-#load in the expression matrix
-##getGEO pulls directly from the GEO website
-##take the first slot of the data containing the correct platform
+## LOADING IN DATA
+### load in the expression matrix
+### getGEO pulls directly from the GEO website
+### take the first slot of the data containing the correct platform
 
 ```{r}
 geo_data <- getGEO("GSE65682", GSEMatrix = T)
 geo_data <- geo_data[[1]]
 ```
 
-#extract the expression data and accompanying metadata
+### extract the expression data and accompanying metadata
 ```{r}
 exprs_df <- exprs(geo_data)
+exprs_df <- data.frame(exprs_df)
+exprs_df$probe_id <- rownames(exprs_df)
 sample_data <- pData(geo_data)
 ```
+
+## GETTING GENE NAMES FOR PROBES
+### we access the gpl number from same page the geo object was obtained
+### find the appropraite columns (ID and Gene symbol) and make a df
+#### add this df to the exprs df, make genes the rownames and remove probes
+
+```{r}
+gpl <- getGEO("GPL13667")
+head(Table(gpl))
+probes <- data.frame(probe_id = Table(gpl)[["ID"]], gene_id = Table(gpl)[["Gene Symbol"]])
+
+exprs_df <- merge(exprs_df, probes, by = "probe_id")
+exprs_df <- exprs_df[, -1]
+rownames(exprs_df) <- exprs_df$gene_id
+```
+
+
+## SETTING UP DATA
+### transpose the expression df to have samples as a row
+### this can then be mergeed with the metadata
+### this results in a single df with each patient in a row, with their expression data and clinical info in the columns
+```{r}
+exprs_df <- t(exprs_df)
+exprs_df <- as.data.frame(exprs_df)
+exprs_df$sample_id <- rownames(exprs_df)
+
+sample_data$sample_id <- rownames(sample_data)
+df <- merge(exprs_df, sample_data, by = "sample_id")
+
+```
+
+
+
