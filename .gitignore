@@ -1,0 +1,13 @@
+# Quarto generated files
+*.docx
+*.js
+*.css
+_site/
+_html/
+_quarto_cache/
+
+# R-related
+.Rhistory
+.RData
+.Rproj.user
+

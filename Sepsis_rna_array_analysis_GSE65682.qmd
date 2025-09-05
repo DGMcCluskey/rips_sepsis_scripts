@@ -1,0 +1,20 @@
+---
+title: "Sepsis RNA array analysis"
+format: html
+---
+
+#RNA array profiles of over 800 sepsis patients with varying survivor status Data from GSE65682 and https://www.sciencedirect.com/science/article/pii/S2213260017302941#cesec20
+
+```{r}
+library(GEOquery)
+library(biomaRt)
+library(limma)
+```
+
+```{r}
+setwd("C:/Users/dan94/rips_project/")
+```
+
+```{r}
+geo_data <- getGEO(filename = "GSE65682_series_matrix.txt/GSE65682_series_matrix.txt")
+```
