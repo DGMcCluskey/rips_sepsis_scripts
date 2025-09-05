@@ -1,5 +1,5 @@
 this is where the scripts to do with analysis sepsis public datasets for the RIPs story are!
 
-currently only one script, focusing on the re-analsysi of the Qiu et al dataset
+one script focuses on the re-analsysis of the Qiu et al scRNA-seq dataset - this script is still a mess
 
-more to come once different datasets are analysed, and the existing analysis will also get split up as this current script is a crime to coding
+there is also a script on RNA microarray data of >800 sepsis patients, which is a work in progress
