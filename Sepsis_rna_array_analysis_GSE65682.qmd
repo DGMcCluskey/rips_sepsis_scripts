@@ -14,6 +14,7 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 library(GEOquery)
 library(biomaRt)
 library(limma)
+library(dplyr)
 ```
 
 ```{r}
@@ -50,21 +51,25 @@ probes <- data.frame(probe_id = Table(gpl)[["ID"]], gene_id = Table(gpl)[["Gene 
 
 exprs_df <- merge(exprs_df, probes, by = "probe_id")
 exprs_df <- exprs_df[, -1]
+exprs_df <- exprs_df %>%
+  filter(!is.na(gene_id) & gene_id != "") %>%
+  group_by(gene_id) %>%
+  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)), .groups = "drop")
 #rownames(exprs_df) <- exprs_df$gene_id
 ```
 
 
 ## SETTING UP DATA
 ### transpose the expression df to have samples as a row
-### this can then be mergeed with the metadata
+### this can then be merged with the metadata
 ### this results in a single df with each patient in a row, with their expression data and clinical info in the columns
 ```{r}
-exprs_df <- t(exprs_df)
-exprs_df <- as.data.frame(exprs_df)
-exprs_df$sample_id <- rownames(exprs_df)
+full_df <- pivot_longer(exprs_df, names_to = "sample_id", values_to = "expression", cols = 2:803)
+full_df <- pivot_wider(full_df, names_from = gene_id, values_from = expression)
+full_df <- as.data.frame(full_df)
 
 sample_data$sample_id <- rownames(sample_data)
-df <- merge(exprs_df, sample_data, by = "sample_id")
+full_df <- merge(full_df, sample_data, by = "sample_id")
 
 ```
 
