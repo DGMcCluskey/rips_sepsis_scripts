@@ -50,7 +50,7 @@ probes <- data.frame(probe_id = Table(gpl)[["ID"]], gene_id = Table(gpl)[["Gene 
 
 exprs_df <- merge(exprs_df, probes, by = "probe_id")
 exprs_df <- exprs_df[, -1]
-rownames(exprs_df) <- exprs_df$gene_id
+#rownames(exprs_df) <- exprs_df$gene_id
 ```
 
 
