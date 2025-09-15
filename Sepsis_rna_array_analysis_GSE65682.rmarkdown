@@ -3,6 +3,7 @@ title: "Sepsis RNA array analysis"
 format: html
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 ```
@@ -42,8 +43,7 @@ sample_data <- pData(geo_data)
 ## GETTING GENE NAMES FOR PROBES
 ### we access the gpl number from same page the geo object was obtained
 ### find the appropraite columns (ID and Gene symbol) and make a df
-#### add this df to the exprs df
-### finally, to handle duplicate genes (presumably because an array can include multiple probes to the same gene) average them
+#### add this df to the exprs df, make genes the rownames and remove probes
 
 ```{r}
 gpl <- getGEO("GPL13667")
@@ -76,5 +76,6 @@ full_df <- merge(full_df, sample_data, by = "sample_id")
 ```{r}
 ggplot(full_df, aes(x = `mortality_event_28days:ch1`, y = ETS2, fill = `endotype_cohort:ch1`))+geom_boxplot(outlier.shape = NA)+theme_bw()
 ```
+
 
 
