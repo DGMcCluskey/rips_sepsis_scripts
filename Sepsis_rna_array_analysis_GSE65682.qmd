@@ -111,7 +111,7 @@ x <- rf_data[, -11522]
 set.seed(61)
 rf_model <- rf_model <- ranger(
   x = x, y = y, 
-  num.trees = 2000,
+  num.trees = 5000,
   importance = "permutation",
   probability = TRUE,                    # needed for ROC/AUC
   class.weights = c("0" = 1, "1" = 4)  # weight minority class
@@ -121,7 +121,6 @@ rf_model <- rf_model <- ranger(
 ## model diagnostics
 ```{r}
 rf_model
-plot(rf_model$prediction.error, type = "l")
 rf_pred <- rf_model$predictions[, "1"]
 roc_obj <- roc(rf_data$mortality_28d, rf_pred)
 plot(roc_obj, col = "blue", lwd = 2, main = "ROC Curve - Ranger RF")
