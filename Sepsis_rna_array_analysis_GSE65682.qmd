@@ -90,32 +90,36 @@ ggplot(full_df, aes(x = `mortality_event_28days:ch1`, y = ETS2, fill = `endotype
 ### renaming mortality column for ease and removing old name
 ### make all gene columns numeric
 ### then make grouping variable a factor
-### run random forest
-
 ```{r}
-rf_data <- full_df[, c(3:11520, 11571)]
+rf_data <- full_df[, c(3:11520,11564,11568,11571,11572)]
 rf_data$mortality_28d <- rf_data$`mortality_event_28days:ch1`
-rf_data <- rf_data[, -11519]
+rf_data <- rf_data[, -11521]
 rf_data[, 1:11518] <- lapply(rf_data[, 1:11518], as.numeric)
-rf_data$mortality_28d <- as.factor(rf_data$mortality_28d)
+rf_data[, 11519:11522] <- lapply(rf_data[, 11519:11522], as.factor)
 rf_data <- filter(rf_data, mortality_28d %in% c("0","1"))
 colnames(rf_data) <- sub("-", "_", colnames(rf_data))
 colnames(rf_data) <- sub("@", "", colnames(rf_data))
 colnames(rf_data) <- sub(" ", "", colnames(rf_data))
 rf_data$mortality_28d <- droplevels(rf_data$mortality_28d)
+```
+
+## run random forest
+```{r}
+y <- rf_data$mortality_28d
+x <- rf_data[, -11522]
+
+
 rf_model <- rf_model <- ranger(
-  formula = mortality_28d ~ ., 
-  data = rf_data, 
+  x = x, y = y, 
   num.trees = 1000,
   importance = "permutation",
   probability = TRUE,                    # needed for ROC/AUC
-  class.weights = c("0" = 1, "1" = 3),  # weight minority class
+  class.weights = c("0" = 1, "1" = 4),  # weight minority class
   seed = 42
 )
 ```
 
 ## model diagnostics
-
 ```{r}
 rf_model
 # OOB predicted probabilities for class "1"
