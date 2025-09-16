@@ -104,3 +104,55 @@ colnames(rf_data) <- sub(" ", "", colnames(rf_data))
 rf_data$mortality_28d <- droplevels(rf_data$mortality_28d)
 rf_model <- randomForest(mortality_28d ~ ., data = rf_data, importance = T, ntree = 1000)
 ```
+
+## model diagnostics
+
+```{r}
+plot(rf_model$err.rate[,1], type = "l", ylab = "OOB Error", xlab = "Number of Trees")
+plot(rf_model, main = "OOB Error Rate")
+varImpPlot(rf_model, main = "Feature Importance")
+```
+
+## View important features (interactions)
+```{r}
+importance_df <- as.data.frame(importance(rf_model))
+importance_df$interaction <- rownames(importance_df)
+importance_df <- importance_df[order(-importance_df$MeanDecreaseAccuracy), ]
+head(importance_df, 50)
+top_features <- head(importance_df, 20)
+
+p <- ggplot(top_features, aes(x = reorder(interaction, MeanDecreaseAccuracy), y = MeanDecreaseAccuracy, fill = MeanDecreaseGini)) +
+  geom_point(shape = 21, size = 6)+
+  coord_flip() +
+  labs(x = "Interaction", y = "Importance (MeanDecreaseAccuracy)", title = "Top interactions that distinguish\nsurvival at 28 days")+
+  theme_bw()+theme(axis.text = element_text(size = 14, colour = "black"))+
+  scale_fill_viridis_c()
+p
+```
+
+## boxplots of specific interactions and stats
+```{r}
+interactions_plot <- pivot_longer(rf_data, names_to = "interaction", values_to = "prob", 1:11518)
+top_features <- head(importance_df, 20)
+interactions_plot <- filter(interactions_plot, interaction %in% top_features$interaction)
+options(scipen = 999)
+interactions_plot$mortality_28d <- factor(interactions_plot$mortality_28d, levels = c("1", "0"),
+                                          labels = c("Non-survival", "Survival"))
+
+ggplot(interactions_plot, aes(x = mortality_28d, y = prob, fill = mortality_28d))+
+  geom_boxplot(outlier.shape = NA, alpha = 0.4, colour = "black")+
+  geom_jitter(width = 0.1, shape = 21, colour = "black", size = 2)+
+  theme_bw()+
+  facet_wrap(~interaction, scales = "free_y", ncol = 4)+
+  scale_fill_manual(values = c("darkorchid", "mediumseagreen"))+
+  xlab(NULL)+
+  theme(axis.text = element_text(size = 12, colour = "black"))
+
+results <- interactions_plot %>%
+  group_by(interaction) %>%
+  summarise(
+    p_value = wilcox.test(prob ~ mortality_28d)$p.value,
+    .groups = "drop"
+  ) %>%
+  arrange(p_value)
+```
