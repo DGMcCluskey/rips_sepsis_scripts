@@ -108,24 +108,21 @@ rf_data$mortality_28d <- droplevels(rf_data$mortality_28d)
 y <- rf_data$mortality_28d
 x <- rf_data[, -11522]
 
-
+set.seed(61)
 rf_model <- rf_model <- ranger(
   x = x, y = y, 
-  num.trees = 1000,
+  num.trees = 2000,
   importance = "permutation",
   probability = TRUE,                    # needed for ROC/AUC
-  class.weights = c("0" = 1, "1" = 4),  # weight minority class
-  seed = 42
+  class.weights = c("0" = 1, "1" = 4)  # weight minority class
 )
 ```
 
 ## model diagnostics
 ```{r}
 rf_model
-# OOB predicted probabilities for class "1"
+plot(rf_model$prediction.error, type = "l")
 rf_pred <- rf_model$predictions[, "1"]
-
-# ROC curve
 roc_obj <- roc(rf_data$mortality_28d, rf_pred)
 plot(roc_obj, col = "blue", lwd = 2, main = "ROC Curve - Ranger RF")
 auc_val <- auc(roc_obj)
