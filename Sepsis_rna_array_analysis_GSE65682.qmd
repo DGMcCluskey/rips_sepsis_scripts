@@ -16,6 +16,7 @@ library(limma)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(randomForest)
 ```
 
 ```{r}
@@ -44,6 +45,7 @@ sample_data <- pData(geo_data)
 ### we access the gpl number from same page the geo object was obtained
 ### find the appropraite columns (ID and Gene symbol) and make a df
 #### add this df to the exprs df
+### changing gene's with two names and "///" to just the first name
 ### finally, to handle duplicate genes (presumably because an array can include multiple probes to the same gene) average them
 
 ```{r}
@@ -53,6 +55,7 @@ probes <- data.frame(probe_id = Table(gpl)[["ID"]], gene_id = Table(gpl)[["Gene 
 
 exprs_df <- merge(exprs_df, probes, by = "probe_id")
 exprs_df <- exprs_df[, -1]
+exprs_df$gene_id <- sub(" ///.*", "", exprs_df$gene_id)
 exprs_df <- exprs_df %>%
   filter(!is.na(gene_id) & gene_id != "") %>%
   group_by(gene_id) %>%
@@ -74,9 +77,26 @@ sample_data$sample_id <- rownames(sample_data)
 full_df <- merge(full_df, sample_data, by = "sample_id")
 ```
 
+## PLOTTING GENE EXPRESSION
+
 ```{r}
 ggplot(full_df, aes(x = `mortality_event_28days:ch1`, y = ETS2, fill = `endotype_cohort:ch1`))+geom_boxplot(outlier.shape = NA)+theme_bw()
 ```
 
 
-#comments for tomorrow (16/09/25) - perform randomforest to see which genes distinguish patitents by mortality status
+## RANDOM FOREST TO DISTINGUISH SAMPLES BY MORTALITY
+### select only gene columns plus grouping variable of interest
+### renaming mortality column for ease and removing old name
+### make all gene columns numeric
+### then make grouping variable a factor
+### run random forest
+
+```{r}
+rf_data <- full_df[, c(3:11520, 11571)]
+rf_data$mortality_28d <- rf_data$`mortality_event_28days:ch1`
+rf_data <- rf_data[, -11519]
+rf_data[, 1:11518] <- lapply(rf_data[, 1:11518], as.numeric)
+rf_data$mortality_28d <- as.factor(rf_data$mortality_28d)
+rf_data <- filter(rf_data, mortality_28d %in% c("0","1"))
+rf_model <- randomForest(mortality_28d ~ ., data = rf_data, importance = T, ntree = 1000)
+```

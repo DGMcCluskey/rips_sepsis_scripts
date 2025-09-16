@@ -103,7 +103,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GEOquery)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biomaRt)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(limma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(limma)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"C:/Users/dan94/rips_project/"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -127,7 +130,200 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="extract-the-expression-data-and-accompanying-metadata">extract the expression data and accompanying metadata</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">exprs</span>(geo_data)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_data <span class="ot">&lt;-</span> <span class="fu">pData</span>(geo_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(exprs_df)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>exprs_df<span class="sc">$</span>probe_id <span class="ot">&lt;-</span> <span class="fu">rownames</span>(exprs_df)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>sample_data <span class="ot">&lt;-</span> <span class="fu">pData</span>(geo_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="getting-gene-names-for-probes" class="level2">
+<h2 class="anchored" data-anchor-id="getting-gene-names-for-probes">GETTING GENE NAMES FOR PROBES</h2>
+<section id="we-access-the-gpl-number-from-same-page-the-geo-object-was-obtained" class="level3">
+<h3 class="anchored" data-anchor-id="we-access-the-gpl-number-from-same-page-the-geo-object-was-obtained">we access the gpl number from same page the geo object was obtained</h3>
+</section>
+<section id="find-the-appropraite-columns-id-and-gene-symbol-and-make-a-df" class="level3">
+<h3 class="anchored" data-anchor-id="find-the-appropraite-columns-id-and-gene-symbol-and-make-a-df">find the appropraite columns (ID and Gene symbol) and make a df</h3>
+<section id="add-this-df-to-the-exprs-df" class="level4">
+<h4 class="anchored" data-anchor-id="add-this-df-to-the-exprs-df">add this df to the exprs df</h4>
+</section>
+</section>
+<section id="finally-to-handle-duplicate-genes-presumably-because-an-array-can-include-multiple-probes-to-the-same-gene-average-them" class="level3">
+<h3 class="anchored" data-anchor-id="finally-to-handle-duplicate-genes-presumably-because-an-array-can-include-multiple-probes-to-the-same-gene-average-them">finally, to handle duplicate genes (presumably because an array can include multiple probes to the same gene) average them</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gpl <span class="ot">&lt;-</span> <span class="fu">getGEO</span>(<span class="st">"GPL13667"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">Table</span>(gpl))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             ID             GeneChip Array Species Scientific Name
+1   11715100_at Human Genome HG-U219 Array            Homo sapiens
+2 11715101_s_at Human Genome HG-U219 Array            Homo sapiens
+3 11715102_x_at Human Genome HG-U219 Array            Homo sapiens
+4 11715103_x_at Human Genome HG-U219 Array            Homo sapiens
+5 11715104_s_at Human Genome HG-U219 Array            Homo sapiens
+6   11715105_at Human Genome HG-U219 Array            Homo sapiens
+  Annotation Date      Sequence Type                 Sequence Source
+1       20-Aug-10 Consensus sequence Affymetrix Proprietary Database
+2       20-Aug-10 Consensus sequence Affymetrix Proprietary Database
+3       20-Aug-10 Consensus sequence Affymetrix Proprietary Database
+4       20-Aug-10 Consensus sequence Affymetrix Proprietary Database
+5       20-Aug-10 Consensus sequence Affymetrix Proprietary Database
+6       20-Aug-10 Consensus sequence Affymetrix Proprietary Database
+  Transcript ID(Array Design)
+1                   g21264570
+2                   g21264570
+3                   g21264570
+4                   g22748780
+5                   g30039713
+6                   g45580703
+                                                                                Target Description
+1 g21264570 /TID=g21264570 /CNT=1 /FEA=FLmRNA /TIER=FL /STK=0 /DEF=g21264570 /REP_ORG=Homo sapiens
+2 g21264570 /TID=g21264570 /CNT=1 /FEA=FLmRNA /TIER=FL /STK=0 /DEF=g21264570 /REP_ORG=Homo sapiens
+3 g21264570 /TID=g21264570 /CNT=1 /FEA=FLmRNA /TIER=FL /STK=0 /DEF=g21264570 /REP_ORG=Homo sapiens
+4 g22748780 /TID=g22748780 /CNT=1 /FEA=FLmRNA /TIER=FL /STK=0 /DEF=g22748780 /REP_ORG=Homo sapiens
+5 g30039713 /TID=g30039713 /CNT=1 /FEA=FLmRNA /TIER=FL /STK=0 /DEF=g30039713 /REP_ORG=Homo sapiens
+6 g45580703 /TID=g45580703 /CNT=1 /FEA=FLmRNA /TIER=FL /STK=0 /DEF=g45580703 /REP_ORG=Homo sapiens
+  Representative Public ID Archival UniGene Cluster UniGene ID
+1                g21264570                      ---  Hs.247813
+2                g21264570                      ---  Hs.247813
+3                g21264570                      ---  Hs.247813
+4                g22748780                      ---  Hs.465643
+5                g30039713                      ---  Hs.352515
+6                g45580703                      ---  Hs.439154
+                                      Genome Version
+1 February 2009 (Genome Reference Consortium GRCh37)
+2 February 2009 (Genome Reference Consortium GRCh37)
+3 February 2009 (Genome Reference Consortium GRCh37)
+4 February 2009 (Genome Reference Consortium GRCh37)
+5 February 2009 (Genome Reference Consortium GRCh37)
+6 February 2009 (Genome Reference Consortium GRCh37)
+                                     Alignments
+1  chr6:26271145-26271612 (-) // 100.0 // p22.2
+2  chr6:26271145-26271612 (-) // 100.0 // p22.2
+3  chr6:26271145-26271612 (-) // 100.0 // p22.2
+4   chr19:4639529-5145579 (+) // 48.53 // p13.3
+5 chr17:72920369-72929640 (+) // 100.0 // q25.1
+6   chr17:35732984-35749660 (+) // 98.15 // q12
+                                             Gene Title Gene Symbol
+1                                histone cluster 1, H3g    HIST1H3G
+2                                histone cluster 1, H3g    HIST1H3G
+3                                histone cluster 1, H3g    HIST1H3G
+4 tumor necrosis factor, alpha-induced protein 8-like 1   TNFAIP8L1
+5                                           otopetrin 2       OTOP2
+6                   chromosome 17 open reading frame 78    C17orf78
+  Chromosomal Location                GB_LIST SPOT_ID Unigene Cluster Type
+1            chr6p21.3              NM_003534                  full length
+2            chr6p21.3              NM_003534                  full length
+3            chr6p21.3              NM_003534                  full length
+4           chr19p13.3 NM_001167942,NM_152362                  full length
+5           chr17q25.1              NM_178160                  full length
+6             chr17q12              NM_173625                  full length
+          Ensembl Entrez Gene SwissProt  EC   OMIM          RefSeq Protein ID
+1             ---        8355    P68431 --- 602815                  NP_003525
+2 ENSG00000178458        8355    P68431 --- 602815                  NP_003525
+3             ---        8355    P68431 --- 602815                  NP_003525
+4 ENSG00000185361      126282    Q8WVP5 ---    --- NP_001161414 /// NP_689575
+5 ENSG00000183034       92736    Q7RTS6 --- 607827                  NP_835454
+6 ENSG00000167230      284099    Q8N4C9 ---    ---                  NP_775896
+        RefSeq Transcript ID FlyBase AGI WormBase MGI Name RGD Name
+1                  NM_003534     --- ---      ---      ---      ---
+2                  NM_003534     --- ---      ---      ---      ---
+3                  NM_003534     --- ---      ---      ---      ---
+4 NM_001167942 /// NM_152362     --- ---      ---      ---      ---
+5                  NM_178160     --- ---      ---      ---      ---
+6                  NM_173625     --- ---      ---      ---      ---
+  SGD accession number
+1                  ---
+2                  ---
+3                  ---
+4                  ---
+5                  ---
+6                  ---
+                                       Gene Ontology Biological Process
+1 0006334 // nucleosome assembly // inferred from electronic annotation
+2 0006334 // nucleosome assembly // inferred from electronic annotation
+3 0006334 // nucleosome assembly // inferred from electronic annotation
+4                                                                   ---
+5                                                                   ---
+6                                                                   ---
+                                                                                                                                                             Gene Ontology Cellular Component
+1 0000786 // nucleosome // inferred from electronic annotation /// 0005634 // nucleus // inferred from electronic annotation /// 0005694 // chromosome // inferred from electronic annotation
+2 0000786 // nucleosome // inferred from electronic annotation /// 0005634 // nucleus // inferred from electronic annotation /// 0005694 // chromosome // inferred from electronic annotation
+3 0000786 // nucleosome // inferred from electronic annotation /// 0005634 // nucleus // inferred from electronic annotation /// 0005694 // chromosome // inferred from electronic annotation
+4                                                                                                                                                                                         ---
+5                                                       0016020 // membrane // inferred from electronic annotation /// 0016021 // integral to membrane // inferred from electronic annotation
+6                                                       0016020 // membrane // inferred from electronic annotation /// 0016021 // integral to membrane // inferred from electronic annotation
+                                                                                                    Gene Ontology Molecular Function
+1 0003677 // DNA binding // inferred from electronic annotation /// 0005515 // protein binding // inferred from physical interaction
+2 0003677 // DNA binding // inferred from electronic annotation /// 0005515 // protein binding // inferred from physical interaction
+3 0003677 // DNA binding // inferred from electronic annotation /// 0005515 // protein binding // inferred from physical interaction
+4                                                                                                                                ---
+5                                                                                                                                ---
+6                                                                                                                                ---
+  Pathway
+1     ---
+2     ---
+3     ---
+4     ---
+5     ---
+6     ---
+                                                                                                                  InterPro
+1                                                                                                                      ---
+2                                                                                                                      ---
+3                                                                                                                      ---
+4                                                                                                                      ---
+5 IPR004878 // Protein of unknown function DUF270 // 1.0E-6 /// IPR004878 // Protein of unknown function DUF270 // 1.0E-13
+6                                                                                                                      ---
+                                                                                               Trans Membrane
+1                                                                                                         ---
+2                                                                                                         ---
+3                                                                                                         ---
+4                                                                                                         ---
+5 NP_835454.1 // span:30-52,62-81,101-120,135-157,240-262,288-310,327-349,369-391,496-515,525-547 // numtm:10
+6                            AAH34672.1 // span:184-206 // numtm:1 /// NP_775896.3 // span:184-206 // numtm:1
+  QTL
+1 ---
+2 ---
+3 ---
+4 ---
+5 ---
+6 ---
+                                                                                                                                   Annotation Description
+1 This probe set was annotated using the Matching Probes based pipeline to a Entrez Gene identifier using 1 transcripts. // false // Matching Probes // A
+2 This probe set was annotated using the Matching Probes based pipeline to a Entrez Gene identifier using 2 transcripts. // false // Matching Probes // A
+3 This probe set was annotated using the Matching Probes based pipeline to a Entrez Gene identifier using 1 transcripts. // false // Matching Probes // A
+4 This probe set was annotated using the Matching Probes based pipeline to a Entrez Gene identifier using 5 transcripts. // false // Matching Probes // A
+5 This probe set was annotated using the Matching Probes based pipeline to a Entrez Gene identifier using 3 transcripts. // false // Matching Probes // A
+6 This probe set was annotated using the Matching Probes based pipeline to a Entrez Gene identifier using 5 transcripts. // false // Matching Probes // A
+                                                    Annotation Transcript Cluster
+1                                                                   NM_003534(11)
+2                                                      BC079835(11),NM_003534(11)
+3                                                                   NM_003534(11)
+4     BC017672(11),BC044250(9),ENST00000327473(11),NM_001167942(11),NM_152362(11)
+5                           ENST00000331427(11),ENST00000426069(11),NM_178160(11)
+6 AK096966(10),BC034672(11),ENST00000300618(11),ENST00000321564(11),NM_173625(11)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Transcript Assignments
+1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           NM_003534 // Homo sapiens histone cluster 1, H3g (HIST1H3G), mRNA. // refseq // 11 // ---
+2                                                                                                                                                                                                                                                                                              BC079835 // Homo sapiens histone cluster 1, H3g, mRNA (cDNA clone IMAGE:5935692). // gb_htc // 11 // --- /// ENST00000321285 // cdna:known chromosome:GRCh37:6:26271202:26271612:-1 gene:ENSG00000178458 // ensembl // 11 // --- /// GENSCAN00000044911 // cdna:Genscan chromosome:GRCh37:6:26271202:26271612:-1 // ensembl // 11 // --- /// NM_003534 // Homo sapiens histone cluster 1, H3g (HIST1H3G), mRNA. // refseq // 11 // ---
+3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           NM_003534 // Homo sapiens histone cluster 1, H3g (HIST1H3G), mRNA. // refseq // 11 // ---
+4 BC017672 // Homo sapiens tumor necrosis factor, alpha-induced protein 8-like 1, mRNA (cDNA clone MGC:17791 IMAGE:3885999), complete cds. // gb // 11 // --- /// BC044250 // Homo sapiens tumor necrosis factor, alpha-induced protein 8-like 1, mRNA (cDNA clone IMAGE:5784807). // gb // 9 // --- /// ENST00000327473 // cdna:known chromosome:GRCh37:19:4639530:4653952:1 gene:ENSG00000185361 // ensembl // 11 // --- /// NM_001167942 // Homo sapiens tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), transcript variant 1, mRNA. // refseq // 11 // --- /// NM_152362 // Homo sapiens tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), transcript variant 2, mRNA. // refseq // 11 // ---
+5                                                                                                                                                                                                                                                                                                                                                                                                         ENST00000331427 // cdna:known chromosome:GRCh37:17:72920370:72929640:1 gene:ENSG00000183034 // ensembl // 11 // --- /// ENST00000426069 // cdna:known chromosome:GRCh37:17:72920370:72929640:1 gene:ENSG00000183034 // ensembl // 11 // --- /// NM_178160 // Homo sapiens otopetrin 2 (OTOP2), mRNA. // refseq // 11 // ---
+6                                                                                                                                         AK096966 // Homo sapiens cDNA FLJ39647 fis, clone SMINT2004781. // gb // 10 // --- /// BC034672 // Homo sapiens chromosome 17 open reading frame 78, mRNA (cDNA clone MGC:34759 IMAGE:5184947), complete cds. // gb // 11 // --- /// ENST00000300618 // cdna:known chromosome:GRCh37:17:35732985:35749660:1 gene:ENSG00000167230 // ensembl // 11 // --- /// ENST00000321564 // cdna:known chromosome:GRCh37:17:35732985:35749660:1 gene:ENSG00000167230 // ensembl // 11 // --- /// NM_173625 // Homo sapiens chromosome 17 open reading frame 78 (C17orf78), mRNA. // refseq // 11 // ---
+                                                                                                                                                                           Annotation Notes
+1                                                                                                                                      BC079835 // gb_htc // 6 // Cross Hyb Matching Probes
+2                                                                                                                                                                                       ---
+3 GENSCAN00000044911 // ensembl // 4 // Cross Hyb Matching Probes /// ENST00000321285 // ensembl // 4 // Cross Hyb Matching Probes /// BC079835 // gb_htc // 7 // Cross Hyb Matching Probes
+4                                                                                                                                                                                       ---
+5                                                                                                                           GENSCAN00000031612 // ensembl // 8 // Cross Hyb Matching Probes
+6                                                                                                                                                                                       ---</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>probes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">probe_id =</span> <span class="fu">Table</span>(gpl)[[<span class="st">"ID"</span>]], <span class="at">gene_id =</span> <span class="fu">Table</span>(gpl)[[<span class="st">"Gene Symbol"</span>]])</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">merge</span>(exprs_df, probes, <span class="at">by =</span> <span class="st">"probe_id"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> exprs_df[, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> exprs_df <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(gene_id) <span class="sc">&amp;</span> gene_id <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(gene_id) <span class="sc">%&gt;%</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#rownames(exprs_df) &lt;- exprs_df$gene_id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -136,37 +332,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="transpose-the-expression-df-to-have-samples-as-a-row" class="level3">
 <h3 class="anchored" data-anchor-id="transpose-the-expression-df-to-have-samples-as-a-row">transpose the expression df to have samples as a row</h3>
 </section>
-<section id="this-can-then-be-mergeed-with-the-metadata" class="level3">
-<h3 class="anchored" data-anchor-id="this-can-then-be-mergeed-with-the-metadata">this can then be mergeed with the metadata</h3>
+<section id="this-can-then-be-merged-with-the-metadata" class="level3">
+<h3 class="anchored" data-anchor-id="this-can-then-be-merged-with-the-metadata">this can then be merged with the metadata</h3>
 </section>
-<section id="this-results-in-a-single-df-with-each-patient-in-a-row-with-their-expression-data-and" class="level3">
-<h3 class="anchored" data-anchor-id="this-results-in-a-single-df-with-each-patient-in-a-row-with-their-expression-data-and">this results in a single df with each patient in a row, with their expression data and</h3>
-</section>
-<section id="clinical-info-in-the-columns" class="level3">
-<h3 class="anchored" data-anchor-id="clinical-info-in-the-columns">clinical info in the columns</h3>
+<section id="this-results-in-a-single-df-with-each-patient-in-a-row-with-their-expression-data-and-clinical-info-in-the-columns" class="level3">
+<h3 class="anchored" data-anchor-id="this-results-in-a-single-df-with-each-patient-in-a-row-with-their-expression-data-and-clinical-info-in-the-columns">this results in a single df with each patient in a row, with their expression data and clinical info in the columns</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">t</span>(exprs_df)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>exprs_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(exprs_df)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>exprs_df<span class="sc">$</span>sample_id <span class="ot">&lt;-</span> <span class="fu">rownames</span>(exprs_df)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>sample_data<span class="sc">$</span>sample_id <span class="ot">&lt;-</span> <span class="fu">rownames</span>(sample_data)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">merge</span>(exprs_df, sample_data, <span class="at">by =</span> <span class="st">"sample_id"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>full_df <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(exprs_df, <span class="at">names_to =</span> <span class="st">"sample_id"</span>, <span class="at">values_to =</span> <span class="st">"expression"</span>, <span class="at">cols =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">803</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>full_df <span class="ot">&lt;-</span> <span class="fu">pivot_wider</span>(full_df, <span class="at">names_from =</span> gene_id, <span class="at">values_from =</span> expression)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>full_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(full_df)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>sample_data<span class="sc">$</span>sample_id <span class="ot">&lt;-</span> <span class="fu">rownames</span>(sample_data)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>full_df <span class="ot">&lt;-</span> <span class="fu">merge</span>(full_df, sample_data, <span class="at">by =</span> <span class="st">"sample_id"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-</section>
-<section id="getting-gene-names-for-probes" class="level2">
-<h2 class="anchored" data-anchor-id="getting-gene-names-for-probes">GETTING GENE NAMES FOR PROBES</h2>
-<section id="we-need-to-get-the-ensembl-gene-names-and-then-map-these-to-the-porbes-used-in-the-experiment" class="level3">
-<h3 class="anchored" data-anchor-id="we-need-to-get-the-ensembl-gene-names-and-then-map-these-to-the-porbes-used-in-the-experiment">we need to get the ensembl gene names and then map these to the porbes used in the experiment</h3>
-</section>
-<section id="we-also-pull-out-the-probe-names" class="level3">
-<h3 class="anchored" data-anchor-id="we-also-pull-out-the-probe-names">we also pull out the probe names</h3>
-</section>
-<section id="according-to-geo-this-group-used-hg-u219-affymetrix-human-genome-u219-array" class="level3">
-<h3 class="anchored" data-anchor-id="according-to-geo-this-group-used-hg-u219-affymetrix-human-genome-u219-array">according to geo this group used “[HG-U219] Affymetrix Human Genome U219 Array”</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ensembl <span class="ot">&lt;-</span> <span class="fu">useMart</span>(<span class="st">"ensembl"</span>, <span class="at">dataset =</span> <span class="st">"hsapiens_gene_ensembl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(full_df, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">mortality_event_28days:ch1</span><span class="st">`</span>, <span class="at">y =</span> ETS2, <span class="at">fill =</span> <span class="st">`</span><span class="at">endotype_cohort:ch1</span><span class="st">`</span>))<span class="sc">+</span><span class="fu">geom_boxplot</span>(<span class="at">outlier.shape =</span> <span class="cn">NA</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Sepsis_rna_array_analysis_GSE65682_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
+</div>
+</div>
+<p>#comments for tomorrow (16/09/25) - perform randomforest to see which genes distinguish patitents by mortality status</p>
 </section>
 </section>
 </section>
