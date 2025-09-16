@@ -98,5 +98,9 @@ rf_data <- rf_data[, -11519]
 rf_data[, 1:11518] <- lapply(rf_data[, 1:11518], as.numeric)
 rf_data$mortality_28d <- as.factor(rf_data$mortality_28d)
 rf_data <- filter(rf_data, mortality_28d %in% c("0","1"))
+colnames(rf_data) <- sub("-", "_", colnames(rf_data))
+colnames(rf_data) <- sub("@", "", colnames(rf_data))
+colnames(rf_data) <- sub(" ", "", colnames(rf_data))
+rf_data$mortality_28d <- droplevels(rf_data$mortality_28d)
 rf_model <- randomForest(mortality_28d ~ ., data = rf_data, importance = T, ntree = 1000)
 ```
