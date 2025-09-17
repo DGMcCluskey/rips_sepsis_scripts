@@ -84,6 +84,10 @@ full_df <- merge(full_df, sample_data, by = "sample_id")
 ggplot(full_df, aes(x = `mortality_event_28days:ch1`, y = ETS2, fill = `endotype_cohort:ch1`))+geom_boxplot(outlier.shape = NA)+theme_bw()
 ```
 
+## SAVE FULL DATAFRAME
+```{r}
+saveRDS(full_df, file = "sepsis_rna_array.rds", compress = F)
+```
 
 ## RANDOM FOREST TO DISTINGUISH SAMPLES BY MORTALITY
 ### select only gene columns plus grouping variable of interest
