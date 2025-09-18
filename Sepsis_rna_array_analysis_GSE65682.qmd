@@ -98,7 +98,6 @@ saveRDS(full_df, file = "sepsis_rna_array.rds", compress = F)
 ### make all gene columns numeric
 ### then make grouping variable a factor
 ```{r}
-dddd
 rf_data <- full_df[, c(3:11520,11564,11568,11571,11572)]
 rf_data$mortality_28d <- rf_data$`mortality_event_28days:ch1`
 rf_data <- rf_data[, -11521]
