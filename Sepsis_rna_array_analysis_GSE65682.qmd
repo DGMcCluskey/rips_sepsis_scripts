@@ -4,7 +4,10 @@ format: html
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE
+)
 ```
 
 # RNA array profiles of over 800 sepsis patients with varying survivor status Data from GSE65682 and https://www.sciencedirect.com/science/article/pii/S2213260017302941#cesec20
@@ -24,9 +27,6 @@ library(pROC)
 setwd("C:/Users/dan94/rips_project/")
 ```
 
-```{r}
-
-```
 ## LOADING IN DATA
 ### load in the expression matrix
 ### getGEO pulls directly from the GEO website
@@ -176,4 +176,12 @@ results <- interactions_plot %>%
     .groups = "drop"
   ) %>%
   arrange(p_value)
+```
+
+## simpler analysis by looking at expression between survival groups and looking at outliers
+
+```{r}
+plot_df <- full_df[, c(1,3:11520,11564,11568,11571,11572)]
+plot_df <- pivot_longer(plot_df, names_to = "gene", values_to = "expression", 2:11519)
+names(plot_df)[4] <- "mortality_28d"
 ```
